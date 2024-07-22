@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetingRoomApp", "MeetingRoomApp\MeetingRoomApp.csproj", "{32FD1F01-6138-4DA4-B72B-5F4B8A642051}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{32FD1F01-6138-4DA4-B72B-5F4B8A642051}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32FD1F01-6138-4DA4-B72B-5F4B8A642051}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32FD1F01-6138-4DA4-B72B-5F4B8A642051}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32FD1F01-6138-4DA4-B72B-5F4B8A642051}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
