@@ -29,13 +29,14 @@ public class AuthService : IAuthService
 
         var user = new User
         {
+            Name = registerDto.Name, 
             Email = registerDto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-            Role = "User" // Default role
+            Role = "User" 
         };
 
         var createdUser = await _userRepository.CreateAsync(user);
-        return new UserAuthDto { Id = createdUser.Id, Email = createdUser.Email, Role = createdUser.Role };
+        return new UserAuthDto { Id = createdUser.Id, Name = createdUser.Name, Email = createdUser.Email, Role = createdUser.Role }; 
     }
 
     public async Task<string> LoginAsync(UserAuthDto loginDto)

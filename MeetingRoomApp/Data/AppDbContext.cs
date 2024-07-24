@@ -29,19 +29,5 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<MeetingParticipant> MeetingParticipants { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<MeetingParticipant>()
-            .HasKey(mp => new { mp.MeetingId, mp.UserId });
-
-        modelBuilder.Entity<MeetingParticipant>()
-            .HasOne(mp => mp.Meeting)
-            .WithMany(m => m.MeetingParticipants)
-            .HasForeignKey(mp => mp.MeetingId);
-
-        modelBuilder.Entity<MeetingParticipant>()
-            .HasOne(mp => mp.User)
-            .WithMany(u => u.MeetingParticipants)
-            .HasForeignKey(mp => mp.UserId);
-    }
+   
 }

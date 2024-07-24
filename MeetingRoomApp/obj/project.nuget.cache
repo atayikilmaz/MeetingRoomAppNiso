@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "D0NA7uNRN0vB/zrbGz4MOPR/lQHoXm7lFXRGc3cj4QatNwZnPkZaHbyw1xrM7e/yeamt1+Ei7jVHTSFfFxzRWA==",
+  "dgSpecHash": "wMq24vaPk+9DZF9PbyHecg373vxlon+fsLi9Mmsg6Y5aVA6mRsV3mEaFSf4anoUPPZlyP+lxgb1frhPZ+0UwCw==",
   "success": true,
   "projectFilePath": "/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/MeetingRoomApp.csproj",
   "expectedPackageFiles": [
+    "/Users/pheal/.nuget/packages/automapper/13.0.1/automapper.13.0.1.nupkg.sha512",
     "/Users/pheal/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/pheal/.nuget/packages/dotnetenv/3.0.0/dotnetenv.3.0.0.nupkg.sha512",
     "/Users/pheal/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",

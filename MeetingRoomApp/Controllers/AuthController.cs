@@ -1,5 +1,8 @@
+using System.Security.Claims;
 using MeetingRoomApp.Dtos;
 using MeetingRoomApp.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetingRoomApp.Controllers;
@@ -30,6 +33,8 @@ public class AuthController : ControllerBase
         }
     }
 
+     
+    
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login(UserAuthDto loginDto)
     {
@@ -42,5 +47,6 @@ public class AuthController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+    
     }
 }

@@ -122,3 +122,4 @@
 /Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/AutoMapper.dll
