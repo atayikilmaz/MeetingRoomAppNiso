@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeetingRoomApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240722125731_Initial")]
-    partial class Initial
+    [Migration("20240723192555_InitialSupabase")]
+    partial class InitialSupabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,21 @@ namespace MeetingRoomApp.Migrations
                     b.ToTable("Meetings");
                 });
 
+            modelBuilder.Entity("MeetingRoomApp.Models.MeetingParticipant", b =>
+                {
+                    b.Property<int>("MeetingId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("MeetingId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MeetingParticipants");
+                });
+
             modelBuilder.Entity("MeetingRoomApp.Models.MeetingRoom", b =>
                 {
                     b.Property<int>("Id")
@@ -86,7 +101,7 @@ namespace MeetingRoomApp.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -99,48 +114,49 @@ namespace MeetingRoomApp.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MeetingUser", b =>
-                {
-                    b.Property<int>("MeetingsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ParticipantsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("MeetingsId", "ParticipantsId");
-
-                    b.HasIndex("ParticipantsId");
-
-                    b.ToTable("MeetingUser");
-                });
-
             modelBuilder.Entity("MeetingRoomApp.Models.Meeting", b =>
                 {
-                    b.HasOne("MeetingRoomApp.Models.MeetingRoom", null)
+                    b.HasOne("MeetingRoomApp.Models.MeetingRoom", "MeetingRoom")
                         .WithMany("Meetings")
                         .HasForeignKey("MeetingRoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MeetingRoom");
                 });
 
-            modelBuilder.Entity("MeetingUser", b =>
+            modelBuilder.Entity("MeetingRoomApp.Models.MeetingParticipant", b =>
                 {
-                    b.HasOne("MeetingRoomApp.Models.Meeting", null)
-                        .WithMany()
-                        .HasForeignKey("MeetingsId")
+                    b.HasOne("MeetingRoomApp.Models.Meeting", "Meeting")
+                        .WithMany("MeetingParticipants")
+                        .HasForeignKey("MeetingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MeetingRoomApp.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("ParticipantsId")
+                    b.HasOne("MeetingRoomApp.Models.User", "User")
+                        .WithMany("MeetingParticipants")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Meeting");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MeetingRoomApp.Models.Meeting", b =>
+                {
+                    b.Navigation("MeetingParticipants");
                 });
 
             modelBuilder.Entity("MeetingRoomApp.Models.MeetingRoom", b =>
                 {
                     b.Navigation("Meetings");
+                });
+
+            modelBuilder.Entity("MeetingRoomApp.Models.User", b =>
+                {
+                    b.Navigation("MeetingParticipants");
                 });
 #pragma warning restore 612, 618
         }
