@@ -1,13 +1,14 @@
 using MeetingRoomApp.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace MeetingRoomApp.Interfaces;
-
-public interface IUserRepository
+namespace MeetingRoomApp.Interfaces
 {
-    Task<User> GetByEmailAsync(string email);
-    Task<User> CreateAsync(User user);
-
-
-    
-    Task<IEnumerable<User>> GetAllAsync();
+    public interface IUserRepository
+    {
+        Task<IEnumerable<User>> GetAllAsync();
+        Task<User> GetByIdAsync(int id);
+        Task DeleteAsync(User user);
+        Task UpdateAsync(User user);
+    }
 }

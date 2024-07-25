@@ -58,6 +58,6 @@ public class MeetingsController : ControllerBase
     public async Task<ActionResult> DeleteMeeting(int id)
     {
         await _meetingService.DeleteMeetingAsync(id);
-        return NoContent();
+        return Ok(new { message = $"Meeting with id {id} has been deleted." });
     }
 }

@@ -10,17 +10,17 @@ namespace MeetingRoomApp.Controllers;
 [Route("api/[controller]")]
 public class AdminController : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserAuthRepository _userAuthRepository;
 
-    public AdminController(IUserRepository userRepository)
+    public AdminController(IUserAuthRepository userAuthRepository)
     {
-        _userRepository = userRepository;
+        _userAuthRepository = userAuthRepository;
     }
 
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<UserAuthDto>>> GetAllUsers()
     {
-        var users = await _userRepository.GetAllAsync();
+        var users = await _userAuthRepository.GetAllAsync();
         return Ok(users.Select(u => new UserAuthDto { Id = u.Id, Email = u.Email, Role = u.Role }));
     }
 

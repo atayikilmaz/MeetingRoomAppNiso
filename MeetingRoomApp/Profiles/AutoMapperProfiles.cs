@@ -8,6 +8,8 @@ public class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {
+        CreateMap<User, UserDto>();
+
         CreateMap<Meeting, MeetingDto>()
             .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src.MeetingParticipants.Select(mp => mp.User.Name)))
             .ForMember(dest => dest.MeetingRoom, opt => opt.MapFrom(src => src.MeetingRoom.Name));
@@ -30,5 +32,7 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.MeetingRoomId, opt => opt.MapFrom(src => src.MeetingRoomId))
             .ForMember(dest => dest.MeetingParticipants, opt => opt.Ignore());
       
+
+
     }
 }

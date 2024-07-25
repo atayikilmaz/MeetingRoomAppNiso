@@ -10,18 +10,18 @@ namespace MeetingRoomApp.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserAuthRepository _userAuthRepository;
     private readonly IConfiguration _configuration;
 
-    public AuthService(IUserRepository userRepository, IConfiguration configuration)
+    public AuthService(IUserAuthRepository userAuthRepository, IConfiguration configuration)
     {
-        _userRepository = userRepository;
+        _userAuthRepository = userAuthRepository;
         _configuration = configuration;
     }
 
     public async Task<UserAuthDto> RegisterAsync(UserAuthDto registerDto)
     {
-        var existingUser = await _userRepository.GetByEmailAsync(registerDto.Email);
+        var existingUser = await _userAuthRepository.GetByEmailAsync(registerDto.Email);
         if (existingUser != null)
         {
             throw new Exception("User already exists");
@@ -35,13 +35,13 @@ public class AuthService : IAuthService
             Role = "User" 
         };
 
-        var createdUser = await _userRepository.CreateAsync(user);
+        var createdUser = await _userAuthRepository.CreateAsync(user);
         return new UserAuthDto { Id = createdUser.Id, Name = createdUser.Name, Email = createdUser.Email, Role = createdUser.Role }; 
     }
 
     public async Task<string> LoginAsync(UserAuthDto loginDto)
     {
-        var user = await _userRepository.GetByEmailAsync(loginDto.Email);
+        var user = await _userAuthRepository.GetByEmailAsync(loginDto.Email);
         if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
         {
             throw new Exception("Invalid credentials");

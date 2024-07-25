@@ -26,7 +26,7 @@ builder.Services.AddCors(options =>
         {
             builder.WithOrigins("http://localhost:3000")
                 .AllowAnyHeader()
-                .WithMethods("GET", "POST", "DELETE");
+                .WithMethods("GET", "POST", "DELETE", "PUT");
 
         });
 });
@@ -41,13 +41,15 @@ builder.Services.AddSwaggerGen();
 DotNetEnv.Env.Load();
 
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserAuthRepository, UserAuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMeetingRoomRepository, MeetingRoomRepository>();
 builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
 builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
 builder.Services.AddScoped<IMeetingService, MeetingService>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 
