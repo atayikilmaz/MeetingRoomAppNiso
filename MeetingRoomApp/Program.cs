@@ -1,6 +1,7 @@
 using System.Text;
 using MeetingRoomApp.Data;
 using MeetingRoomApp.Interfaces;
+using MeetingRoomApp.Repositories;
 using MeetingRoomApp.Repository;
 using MeetingRoomApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,7 +41,8 @@ DotNetEnv.Env.Load();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
+builder.Services.AddScoped<IMeetingRoomRepository, MeetingRoomRepository>();
+builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
 
 
 var jwtKey = builder.Configuration["Jwt:Key"];
