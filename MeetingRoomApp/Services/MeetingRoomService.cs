@@ -22,5 +22,10 @@ namespace MeetingRoomApp.Services
         {
             await _meetingRoomRepository.DeleteAsync(id);
         }
+        
+        public async Task<IEnumerable<MeetingRoom>> GetAllMeetingRoomsAsync()
+        {
+            return await _meetingRoomRepository.GetAllAsync();
+        }
     }
 }

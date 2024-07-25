@@ -27,7 +27,15 @@ namespace MeetingRoomApp.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             await _meetingRoomService.DeleteMeetingRoomAsync(id);
-            return Ok();
+            return Ok(id);
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MeetingRoomDto>>> GetAll()
+        {
+            var meetingRooms = await _meetingRoomService.GetAllMeetingRoomsAsync();
+            var meetingRoomDtos = meetingRooms.Select(m => new MeetingRoomDto { Id = m.Id, Name = m.Name });
+            return Ok(meetingRoomDtos);
         }
     }
 }

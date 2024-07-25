@@ -7,5 +7,7 @@ namespace MeetingRoomApp.Interfaces
     {
         Task<MeetingRoom> CreateMeetingRoomAsync(MeetingRoom meetingRoom);
         Task DeleteMeetingRoomAsync(int id);
+        Task<IEnumerable<MeetingRoom>> GetAllMeetingRoomsAsync();
+
     }
 }
