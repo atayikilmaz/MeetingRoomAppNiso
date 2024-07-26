@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MeetingRoomApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MeetingRoomApp.Controllers
 {
@@ -41,6 +42,19 @@ namespace MeetingRoomApp.Controllers
             return BadRequest(ModelState);
         }
 
+        [Authorize]
+        [HttpGet ("getCurrentUserRole")]
+        public async Task<IActionResult> GetCurrentUserRole()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return Ok(roles);
+        }
        
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
