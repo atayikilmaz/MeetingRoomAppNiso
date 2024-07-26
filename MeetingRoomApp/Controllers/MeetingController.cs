@@ -1,5 +1,6 @@
 using MeetingRoomApp.Dtos;
 using MeetingRoomApp.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -53,6 +54,7 @@ public class MeetingsController : ControllerBase
         }
         return Ok(updatedMeeting);
     }
+
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteMeeting(int id)

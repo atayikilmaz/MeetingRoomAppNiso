@@ -7,7 +7,7 @@ namespace MeetingRoomApp.Interfaces
     public interface IUserRepository
     {
         Task<IEnumerable<User>> GetAllAsync();
-        Task<User> GetByIdAsync(int id);
+        Task<User> GetByIdAsync(string id);
         Task DeleteAsync(User user);
         Task UpdateAsync(User user);
     }
