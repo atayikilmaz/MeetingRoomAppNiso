@@ -1,33 +1,39 @@
+using System.Collections.Immutable;
 using MeetingRoomApp.Models;
-
-namespace MeetingRoomApp.Data;
-
-
-
-
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-public class AppDbContext : DbContext
+namespace MeetingRoomApp.Data
 {
-    protected readonly IConfiguration Configuration;
-
-    public AppDbContext(IConfiguration configuration)
+    public class AppDbContext : IdentityDbContext
     {
-        Configuration = configuration;
+        protected readonly IConfiguration Configuration;
+
+        public AppDbContext(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
+            options.UseNpgsql(Environment.GetEnvironmentVariable("SUPABASE"));
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<MeetingParticipant>()
+                .HasOne(mp => mp.User)
+                .WithMany(u => u.MeetingParticipants)
+                .HasForeignKey(mp => mp.ParticipantId)
+                .IsRequired();
+        }
+
+        public DbSet<Meeting> Meetings { get; set; }
+        public DbSet<MeetingRoom> MeetingRooms { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<MeetingParticipant> MeetingParticipants { get; set; }
     }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-    {
-        
-        options.UseNpgsql(Environment.GetEnvironmentVariable("SUPABASE"));
-    }
-
-
-    public DbSet<Meeting> Meetings { get; set; }
-    public DbSet<MeetingRoom> MeetingRooms { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<MeetingParticipant> MeetingParticipants { get; set; }
-
-   
 }

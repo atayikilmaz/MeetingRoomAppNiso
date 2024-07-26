@@ -35,7 +35,7 @@ public class MeetingService : IMeetingService
     
         meeting.MeetingParticipants = createMeetingDto.ParticipantIds.Select(userId => new MeetingParticipant
         {
-            UserId = userId
+            ParticipantId = userId.ToString()
         }).ToList();
 
         var createdMeeting = await _meetingRepository.CreateMeetingAsync(meeting);

@@ -1,17 +1,17 @@
+using System.Security.Claims;
 using System.Text;
 using MeetingRoomApp.Data;
 using MeetingRoomApp.Interfaces;
+using MeetingRoomApp.Models;
 using MeetingRoomApp.Repositories;
 using MeetingRoomApp.Repository;
 using MeetingRoomApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-
 
 
 // Database context
@@ -27,7 +27,6 @@ builder.Services.AddCors(options =>
             builder.WithOrigins("http://localhost:3000")
                 .AllowAnyHeader()
                 .WithMethods("GET", "POST", "DELETE", "PUT");
-
         });
 });
 
@@ -36,13 +35,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-
-
 DotNetEnv.Env.Load();
 
 
 builder.Services.AddScoped<IUserAuthRepository, UserAuthRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMeetingRoomRepository, MeetingRoomRepository>();
 builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
 builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
@@ -52,6 +48,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
+builder.Services.AddAuthorization();
+
+
+builder.Services.AddIdentityCore<User>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddApiEndpoints()
+    .AddDefaultTokenProviders();
 
 
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -61,27 +64,21 @@ if (string.IsNullOrEmpty(jwtKey))
 }
 
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-        };
-    });
+        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddIdentityCookies();
 
 builder.Services.AddControllers();
 
 
-
 var app = builder.Build();
 
+
+app.MapIdentityApi<User>();
 
 
 

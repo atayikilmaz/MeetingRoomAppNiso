@@ -4,7 +4,7 @@ public class MeetingParticipant
 {
     public int Id { get; set; }
     public int MeetingId { get; set; }
-    public int UserId { get; set; }
+    public string ParticipantId { get; set; }
 
     // Navigation properties
     public Meeting Meeting { get; set; }
