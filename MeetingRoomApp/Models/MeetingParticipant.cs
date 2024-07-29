@@ -5,6 +5,7 @@ public class MeetingParticipant
     public int Id { get; set; }
     public int MeetingId { get; set; }
     public string ParticipantId { get; set; }
+    public string Email { get; set; }
 
     // Navigation properties
     public Meeting Meeting { get; set; }

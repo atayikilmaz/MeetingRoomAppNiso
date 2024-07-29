@@ -10,5 +10,8 @@ namespace MeetingRoomApp.Interfaces
         Task<User> GetByIdAsync(string id);
         Task DeleteAsync(User user);
         Task UpdateAsync(User user);
+        
+        Task<string> GetEmailByUserIdAsync(string userId);
+
     }
 }

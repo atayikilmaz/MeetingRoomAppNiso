@@ -13,16 +13,37 @@ public class MeetingRepository : IMeetingRepository
     {
         _context = context;
     }
-
     public async Task<List<Meeting>> GetAllMeetingsAsync()
     {
+        var currentYear = DateTime.Now.Year;
+
         return await _context.Meetings
+            .Where(m => m.StartDateTime.Year == currentYear)
             .Include(m => m.MeetingRoom)
             .Include(m => m.MeetingParticipants)
             .ThenInclude(mp => mp.User)
             .ToListAsync();
     }
+    
+    public async Task<IEnumerable<Meeting>> GetUpcomingMeetingsAsync(DateTime start, DateTime end)
+    {
+        var meetings = await _context.Meetings
+            .Where(m => m.StartDateTime >= start && m.StartDateTime <= end)
+            .Include(m => m.MeetingParticipants)
+            .ThenInclude(mp => mp.User)
+            .ToListAsync();
 
+        return meetings;
+    }
+    
+    public async Task<bool> IsMeetingOverlappingAsync(int roomId, DateTime start, DateTime end)
+    {
+        return await _context.Meetings
+            .AnyAsync(m => m.MeetingRoomId == roomId && 
+                           m.StartDateTime < end && 
+                           m.EndDateTime > start);
+    }
+    
     public async Task<Meeting> GetMeetingByIdAsync(int id)
     {
         return await _context.Meetings
@@ -49,6 +70,7 @@ public class MeetingRepository : IMeetingRepository
         return meeting;
     }
 
+    
     public async Task DeleteMeetingAsync(int id)
     {
         var meeting = await _context.Meetings.FindAsync(id);

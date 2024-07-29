@@ -70,6 +70,10 @@ builder.Services.AddScoped<IMeetingService, MeetingService>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddHostedService<MeetingReminderJobService>();
+builder.Services.AddScoped<SendReminderEmailsService>();
+
+
 
 
 builder.Services.AddAuthorization();

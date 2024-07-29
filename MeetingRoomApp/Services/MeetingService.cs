@@ -9,11 +9,13 @@ namespace MeetingRoomApp.Services;
 public class MeetingService : IMeetingService
 {
     private readonly IMeetingRepository _meetingRepository;
+    private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
-    public MeetingService(IMeetingRepository meetingRepository, IMapper mapper)
+    public MeetingService(IMeetingRepository meetingRepository, IUserService userService, IMapper mapper)
     {
         _meetingRepository = meetingRepository;
+        _userService = userService;
         _mapper = mapper;
     }
 
@@ -32,21 +34,25 @@ public class MeetingService : IMeetingService
     public async Task<MeetingDto> CreateMeetingAsync(CreateMeetingDto createMeetingDto)
     {
         var meeting = _mapper.Map<Meeting>(createMeetingDto);
-    
-        meeting.MeetingParticipants = createMeetingDto.ParticipantIds.Select(userId => new MeetingParticipant
+
+        bool isOverlapping = await _meetingRepository.IsMeetingOverlappingAsync(meeting.MeetingRoomId, meeting.StartDateTime, meeting.EndDateTime);
+        if (isOverlapping)
         {
-            ParticipantId = userId.ToString()
-        }).ToList();
+            throw new ConflictException("The meeting time overlaps with another meeting in the same room.");
+        }
+
+        meeting.MeetingParticipants = await Task.WhenAll(createMeetingDto.ParticipantIds.Select(async userId => new MeetingParticipant
+        {
+            ParticipantId = userId.ToString(),
+            Email = await _userService.GetEmailByUserIdAsync(userId)
+        }).ToList());
 
         var createdMeeting = await _meetingRepository.CreateMeetingAsync(meeting);
-    
 
         var fullMeeting = await _meetingRepository.GetMeetingByIdAsync(createdMeeting.Id);
-    
-        return _mapper.Map<MeetingDto>(fullMeeting);
-    }
 
-    public async Task<MeetingDto> UpdateMeetingAsync(UpdateMeetingDto updateMeetingDto)
+        return _mapper.Map<MeetingDto>(fullMeeting);
+    }    public async Task<MeetingDto> UpdateMeetingAsync(UpdateMeetingDto updateMeetingDto)
     {
         var existingMeeting = await _meetingRepository.GetMeetingByIdAsync(updateMeetingDto.Id);
         if (existingMeeting == null)

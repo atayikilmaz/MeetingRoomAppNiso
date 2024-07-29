@@ -23,6 +23,11 @@ namespace MeetingRoomApp.Services
         {
             return await _userRepository.GetAllAsync();
         }
+        
+        public async Task<string> GetEmailByUserIdAsync(string userId)
+        {
+            return await _userRepository.GetEmailByUserIdAsync(userId);
+        }
 
         public async Task<User> GetUserByIdAsync(string id)
         {

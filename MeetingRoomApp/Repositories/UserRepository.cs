@@ -26,6 +26,11 @@ namespace MeetingRoomApp.Repositories
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
+        public async Task<string> GetEmailByUserIdAsync(string userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            return user?.Email;
+        }
         public async Task DeleteAsync(User user)
         {
             _context.Users.Remove(user);
@@ -37,5 +42,7 @@ namespace MeetingRoomApp.Repositories
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
+        
+        
     }
 }
