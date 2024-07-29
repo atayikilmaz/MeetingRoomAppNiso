@@ -33,6 +33,8 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.MeetingParticipants, opt => opt.Ignore());
       
 
+        CreateMap<User, UserDto>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
 
     }
 }

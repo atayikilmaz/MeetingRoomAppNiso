@@ -35,13 +35,13 @@ namespace MeetingRoomApp.Controllers
             return Ok(_mapper.Map<IEnumerable<UserDto>>(users));
         }
 
-       
+        
 
 
 
        
-      [HttpPost("{id}/make-admin")]
-        [Authorize(Roles = "Admin")] // Only allow admins to perform this action
+        [HttpPost("{id}/make-admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> MakeUserAdmin(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -55,23 +55,56 @@ namespace MeetingRoomApp.Controllers
                 await _roleManager.CreateAsync(new IdentityRole("Admin"));
             }
 
-            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            if (currentRoles.Contains("Admin"))
             {
                 return BadRequest($"User {user.UserName} is already an Admin.");
+            }
+
+            // Remove existing role if any
+            if (currentRoles.Any())
+            {
+                await _userManager.RemoveFromRolesAsync(user, currentRoles);
             }
 
             var result = await _userManager.AddToRoleAsync(user, "Admin");
 
             if (result.Succeeded)
             {
-                return Ok($"User {user.UserName} has been made an Admin.");
+                user.Role = "Admin";
+                return Ok(_mapper.Map<UserDto>(user));
             }
             else
             {
                 return BadRequest($"Failed to make user {user.UserName} an Admin. Errors: {string.Join(", ", result.Errors)}");
             }
         }
-
+        
+        
+        [HttpPut("{id}/role")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ChangeUserRole(string id, [FromBody] string role)
+        {
+            try
+            {
+                var user = await _userService.ChangeUserRoleAsync(id, role);
+                return Ok(_mapper.Map<UserDto>(user));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+        
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUserById(string id)
         {
@@ -90,21 +123,7 @@ namespace MeetingRoomApp.Controllers
             return Ok(new { message = $"User with id {id} has been deleted." });
         }
 
-        [HttpPut("{id}/role")]
-        public async Task<ActionResult<UserDto>> ChangeUserRole(string id, ChangeRoleDto changeRoleDto)
-        {
-            if (id != changeRoleDto.Id.ToString())
-            {
-                return BadRequest("Id in the URL and Id in the body do not match.");
-            }
-
-            var updatedUser = await _userService.ChangeUserRoleAsync(id, changeRoleDto.Role);
-            if (updatedUser == null)
-            {
-                return NotFound();
-            }
-            return Ok(_mapper.Map<UserDto>(updatedUser));
-        }
+        
     
     }
 }

@@ -7,5 +7,6 @@ public class User: IdentityUser
 {
     public string? Name { get; set; }
 
+    public string Role { get; set; }
     public ICollection<MeetingParticipant> MeetingParticipants { get; set; }
 }
