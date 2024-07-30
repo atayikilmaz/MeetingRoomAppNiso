@@ -28,7 +28,9 @@ public class MeetingRepository : IMeetingRepository
     public async Task<IEnumerable<Meeting>> GetUpcomingMeetingsAsync(DateTime start, DateTime end)
     {
         var meetings = await _context.Meetings
-            .Where(m => m.StartDateTime >= start && m.StartDateTime <= end)
+            .AsNoTracking()
+            .Where(m => m.StartDateTime >= start && m.StartDateTime <= end && !m.ReminderSent)
+            .Include(m => m.MeetingRoom)
             .Include(m => m.MeetingParticipants)
             .ThenInclude(mp => mp.User)
             .ToListAsync();

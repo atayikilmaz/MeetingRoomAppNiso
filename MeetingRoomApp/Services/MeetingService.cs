@@ -41,18 +41,27 @@ public class MeetingService : IMeetingService
             throw new ConflictException("The meeting time overlaps with another meeting in the same room.");
         }
 
-        meeting.MeetingParticipants = await Task.WhenAll(createMeetingDto.ParticipantIds.Select(async userId => new MeetingParticipant
+        meeting.MeetingParticipants = new List<MeetingParticipant>();
+        foreach (var userId in createMeetingDto.ParticipantIds)
         {
-            ParticipantId = userId.ToString(),
-            Email = await _userService.GetEmailByUserIdAsync(userId)
-        }).ToList());
+            var email = await _userService.GetEmailByUserIdAsync(userId);
+            meeting.MeetingParticipants.Add(new MeetingParticipant
+            {
+                ParticipantId = userId.ToString(),
+                Email = email
+            });
+        }
 
         var createdMeeting = await _meetingRepository.CreateMeetingAsync(meeting);
 
         var fullMeeting = await _meetingRepository.GetMeetingByIdAsync(createdMeeting.Id);
 
         return _mapper.Map<MeetingDto>(fullMeeting);
-    }    public async Task<MeetingDto> UpdateMeetingAsync(UpdateMeetingDto updateMeetingDto)
+    }    
+    
+    
+    
+    public async Task<MeetingDto> UpdateMeetingAsync(UpdateMeetingDto updateMeetingDto)
     {
         var existingMeeting = await _meetingRepository.GetMeetingByIdAsync(updateMeetingDto.Id);
         if (existingMeeting == null)
@@ -61,6 +70,19 @@ public class MeetingService : IMeetingService
         }
 
         _mapper.Map(updateMeetingDto, existingMeeting);
+
+        // Update participants
+        existingMeeting.MeetingParticipants.Clear();
+        foreach (var userId in updateMeetingDto.ParticipantIds)
+        {
+            var email = await _userService.GetEmailByUserIdAsync(userId);
+            existingMeeting.MeetingParticipants.Add(new MeetingParticipant
+            {
+                ParticipantId = userId,
+                Email = email
+            });
+        }
+
         var updatedMeeting = await _meetingRepository.UpdateMeetingAsync(existingMeeting);
         return _mapper.Map<MeetingDto>(updatedMeeting);
     }

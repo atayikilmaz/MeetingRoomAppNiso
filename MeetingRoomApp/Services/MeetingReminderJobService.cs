@@ -31,8 +31,7 @@ public class MeetingReminderJobService : BackgroundService
                 await CheckAndSendReminders(meetingRepository, emailService);
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
-        }
+            await Task.Delay(TimeSpan.FromSeconds(3), stoppingToken);        }
     }
 
     // MeetingReminderJobService.cs

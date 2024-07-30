@@ -27,7 +27,7 @@ namespace MeetingRoomApp.Controllers
             _roleManager = roleManager;
         }
         
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,User")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
         {
