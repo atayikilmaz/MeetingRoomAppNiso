@@ -28,7 +28,7 @@ namespace MeetingRoomApp.Services
                 var smtpClient = new SmtpClient("smtp.gmail.com")
                 {
                     Port = 587,
-                    Credentials = new NetworkCredential("mustafaatayikilmaz@gmail.com", "migr bbpv ehlb cfnb"),
+                    Credentials = new NetworkCredential("mustafaatayikilmaz@gmail.com", Environment.GetEnvironmentVariable("GOOGLE_MAIL_PASSWORD")),
                     EnableSsl = true,
                 };
 

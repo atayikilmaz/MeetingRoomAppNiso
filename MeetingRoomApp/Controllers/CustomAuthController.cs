@@ -30,6 +30,16 @@ namespace MeetingRoomApp.Controllers
 
             if (result.Succeeded)
             {
+                var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                if (!roleResult.Succeeded)
+                {
+                    foreach (var error in roleResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return BadRequest(ModelState);
+                }
+
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return Ok(new { message = "User registered successfully" });
             }
@@ -41,7 +51,6 @@ namespace MeetingRoomApp.Controllers
 
             return BadRequest(ModelState);
         }
-
         [Authorize]
         [HttpGet ("getCurrentUserRole")]
         public async Task<IActionResult> GetCurrentUserRole()

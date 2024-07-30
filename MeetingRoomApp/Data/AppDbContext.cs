@@ -29,6 +29,10 @@ namespace MeetingRoomApp.Data
                 .WithMany(u => u.MeetingParticipants)
                 .HasForeignKey(mp => mp.ParticipantId)
                 .IsRequired();
+            
+            modelBuilder.Entity<MeetingRoom>()
+                .HasIndex(m => m.Name)
+                .IsUnique();
         }
 
         public DbSet<Meeting> Meetings { get; set; }
