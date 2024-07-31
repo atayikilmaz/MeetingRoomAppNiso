@@ -5,6 +5,7 @@ using MeetingRoomApp.Models;
 using MeetingRoomApp.Repositories;
 using MeetingRoomApp.Repository;
 using MeetingRoomApp.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -76,16 +77,56 @@ builder.Services.AddScoped<SendReminderEmailsService>();
 
 
 
-builder.Services.AddAuthorization();
+
 
 // Configure Identity
 builder.Services.AddIdentityApiEndpoints<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    })
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/account/login";
+        options.LogoutPath = "/account/logout";
+    })
+    .AddGoogle(options =>
+    {
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID");
+        options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET");
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
+    });
+
+builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("JwtOrCookie", policy =>
+        {
+            policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+            policy.AuthenticationSchemes.Add(CookieAuthenticationDefaults.AuthenticationScheme);
+            policy.RequireAuthenticatedUser();
+        });
+    });
+   
+
 builder.Services.AddAuthorization();
 
-builder.Services.AddAuthentication();
+
 
 builder.Services.AddControllers();
 
@@ -112,7 +153,7 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 
-  
+
 
 
 

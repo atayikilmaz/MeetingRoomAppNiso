@@ -123,3 +123,10 @@
 /Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
 /Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/AutoMapper.dll
+/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.Google.dll
+/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/Google.Apis.dll
+/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/Google.Apis.Auth.dll
+/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/Google.Apis.Core.dll
+/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/Newtonsoft.Json.dll
+/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/System.Management.dll
+/Users/pheal/Desktop/netfy-shop/backend/MeetingRoomApp/MeetingRoomApp/bin/Debug/net8.0/runtimes/win/lib/net7.0/System.Management.dll

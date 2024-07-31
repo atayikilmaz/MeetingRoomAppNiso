@@ -35,7 +35,7 @@ public async Task SendReminderEmailsAsync(Meeting meeting)
         var smtpClient = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
-            Credentials = new NetworkCredential("mustafaatayikilmaz@gmail.com", "mdud jufz jdmx ynbi"),
+            Credentials = new NetworkCredential("mustafaatayikilmaz@gmail.com", Environment.GetEnvironmentVariable("GOOGLE_MAIL_PASSWORD")),
             EnableSsl = true,
         };
 
