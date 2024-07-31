@@ -71,7 +71,7 @@ namespace MeetingRoomApp.Controllers
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                var token = GenerateJwtToken(user);
+                string token = await GenerateJwtToken(user);
 
                 return Ok(new { Token = token, Message = "Login successful" });
             }
@@ -150,38 +150,47 @@ namespace MeetingRoomApp.Controllers
                     await _signInManager.SignInAsync(user, isPersistent: true);
 
                     // Generate JWT token
-                    var token = GenerateJwtToken(user);
+                    string token = await GenerateJwtToken(user);
 
                     // Redirect with token in URL parameters
-                    return Redirect($"http://localhost:3000?token={token}");
+                    return Redirect($"http://localhost:3000/login?token={token}");
                 }
 
                 return BadRequest();
             }
 
 
-        private string GenerateJwtToken(User user)
-        {
-            var claims = new[]
+            private async Task<string> GenerateJwtToken(User user)
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+                var claims = new List<Claim>
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                };
+    
+                var roles = await _userManager.GetRolesAsync(user);
+                claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(1),
-                signingCredentials: creds
-            );
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTime.Now.AddHours(1),
+                    signingCredentials: creds
+                );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+
+
+                
+            
+           
+        
 
            
            
