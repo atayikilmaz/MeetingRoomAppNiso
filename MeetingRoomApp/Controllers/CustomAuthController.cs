@@ -22,17 +22,22 @@ namespace MeetingRoomApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
 
 
 
 
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration)
+
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, 
+            IConfiguration configuration, IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _emailService = emailService;
         }
+        
         
 
         [HttpPost("register")]
@@ -46,8 +51,16 @@ namespace MeetingRoomApp.Controllers
 
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return Ok(new { message = "User registered successfully" });
+                await _userManager.AddToRoleAsync(user, "User");
+
+                // Generate 2FA token
+                var token = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
+
+                // Send 2FA token via email
+                await _emailService.SendEmailAsync(user.Email, "2FA Verification", 
+                    $"Your 2FA code is: {token}");
+
+                return Ok(new { message = "User registered successfully. Please check your email for 2FA code." });
             }
 
             foreach (var error in result.Errors)
@@ -56,6 +69,24 @@ namespace MeetingRoomApp.Controllers
             }
 
             return BadRequest(ModelState);
+        }
+
+        [HttpPost("verify-2fa")]
+        public async Task<IActionResult> VerifyTwoFactorAuth([FromBody] TwoFactorAuthModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return BadRequest("Invalid email");
+
+            var result = await _userManager.VerifyTwoFactorTokenAsync(user, "Email", model.Token);
+            if (result)
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                string jwtToken = await GenerateJwtToken(user);
+                return Ok(new { Token = jwtToken, Message = "2FA verification successful" });
+            }
+
+            return BadRequest("Invalid 2FA token");
         }
 
         [HttpPost("login")]
@@ -172,12 +203,12 @@ namespace MeetingRoomApp.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
                 claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                 var token = new JwtSecurityToken(
-                    issuer: _configuration["Jwt:Issuer"],
-                    audience: _configuration["Jwt:Audience"],
+                    issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                    audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
                     claims: claims,
                     expires: DateTime.Now.AddHours(1),
                     signingCredentials: creds

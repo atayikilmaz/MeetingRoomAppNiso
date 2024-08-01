@@ -108,6 +108,7 @@ namespace MeetingRoomApp.Controllers
         
         
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserDto>> GetUserById(string id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -119,6 +120,7 @@ namespace MeetingRoomApp.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             await _userService.DeleteUserAsync(id);

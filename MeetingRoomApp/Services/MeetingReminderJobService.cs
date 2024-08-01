@@ -1,99 +1,71 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MeetingRoomApp.Interfaces;
 using MeetingRoomApp.Models;
-using MeetingRoomApp.Services;
 
-public class MeetingReminderJobService : BackgroundService
+public class SendReminderEmailsService
 {
-    private readonly ILogger<MeetingReminderJobService> _logger;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<SendReminderEmailsService> _logger;
+    private readonly IEmailService _emailService;
 
-    public MeetingReminderJobService(ILogger<MeetingReminderJobService> logger, IServiceProvider serviceProvider)
+    public SendReminderEmailsService(ILogger<SendReminderEmailsService> logger, IEmailService emailService)
     {
         _logger = logger;
-        _serviceProvider = serviceProvider;
+        _emailService = emailService;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task SendReminderEmailsAsync(Meeting meeting)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        if (meeting == null)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var meetingRepository = scope.ServiceProvider.GetRequiredService<IMeetingRepository>();
-                var emailService = scope.ServiceProvider.GetRequiredService<SendReminderEmailsService>();
-                await CheckAndSendReminders(meetingRepository, emailService);
-            }
-
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);        }
-    }
-
-    // MeetingReminderJobService.cs
-    private async Task CheckAndSendReminders(IMeetingRepository meetingRepository, SendReminderEmailsService emailService)
-    {
-        var now = DateTime.UtcNow;
-        var fifteenMinutesFromNow = now.AddMinutes(15);
-
-        var upcomingMeetings = await meetingRepository.GetUpcomingMeetingsAsync(now, fifteenMinutesFromNow);
-
-        if (!upcomingMeetings.Any())
-        {
-            _logger.LogInformation($"No upcoming meetings found in the next 15 minutes. Current UTC time: {now}");
+            _logger.LogError("Meeting object is null");
             return;
         }
 
-        _logger.LogInformation($"Found {upcomingMeetings.Count()} upcoming meetings. Current UTC time: {now}");
+        _logger.LogInformation($"Sending reminder emails for meeting: {meeting.Name ?? "Unnamed meeting"}");
 
-        foreach (var meeting in upcomingMeetings)
+        var turkishTime = meeting.StartDateTime.AddHours(3);
+        var emailBody = $@"
+            <html>
+            <body style='font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;'>
+                <div style='background-color: #f0f0f0; padding: 20px; text-align: center;'>
+                    <h1 style='color: #4a4a4a;'>Meeting Reminder</h1>
+                </div>
+                <div style='padding: 20px;'>
+                    <p>Dear Participant,</p>
+                    <p>This email is a reminder for your upcoming meeting.</p>
+                    <div style='background-color: #e9f7fe; border-left: 4px solid #4a90e2; padding: 15px; margin: 20px 0;'>
+                        <h2 style='color: #4a90e2; margin-top: 0;'>{meeting.Name ?? "Unnamed meeting"}</h2>
+                        <p><strong>Date and Time:</strong> {turkishTime:dd MMMM yyyy, dddd, HH:mm} (Turkish Time)</p>
+                        <p><strong>Meeting Room:</strong> {meeting.MeetingRoom?.Name ?? "Unspecified room"}</p>
+                    </div>
+                    <p>Please be prepared to join the meeting on time.</p>
+                    <p>Best regards,<br>Meeting Room App Team</p>
+                </div>
+                <div style='background-color: #f0f0f0; padding: 10px; text-align: center; font-size: 12px;'>
+                    <p>This is an automated notification. Please do not reply to this email.</p>
+                </div>
+            </body>
+            </html>
+        ";
+
+        if (meeting.MeetingParticipants != null && meeting.MeetingParticipants.Any())
         {
-            var timeUntilMeeting = meeting.StartDateTime - now;
-            _logger.LogInformation($"Meeting '{meeting.Name}' is starting at {meeting.StartDateTime:yyyy-MM-dd HH:mm:ss} UTC " +
-                                   $"(in {timeUntilMeeting.TotalMinutes:F1} minutes).");
-
-            if (meeting.MeetingParticipants == null)
+            foreach (var participant in meeting.MeetingParticipants)
             {
-                _logger.LogWarning($"Meeting '{meeting.Name}' has no participants (MeetingParticipants is null).");
-                continue;
-            }
-
-            _logger.LogInformation($"Meeting participants: {string.Join(", ", meeting.MeetingParticipants.Select(p => p.Email))}");
-
-            // Convert UTC time to Turkish time (UTC+3)
-            var turkishTime = meeting.StartDateTime.AddHours(3);
-            _logger.LogInformation($"Meeting '{meeting.Name}' Turkish time: {turkishTime:yyyy-MM-dd HH:mm:ss}");
-
-            // Send reminder email if not already sent
-            if (!meeting.ReminderSent)
-            {
-                await SendReminderEmail(meeting, emailService, meetingRepository);
+                if (!string.IsNullOrEmpty(participant?.Email))
+                {
+                    await _emailService.SendEmailAsync(participant.Email, 
+                        $"Reminder: {meeting.Name ?? "Unnamed meeting"} Meeting Starts in 15 Minutes", 
+                        emailBody);
+                }
+                else
+                {
+                    _logger.LogWarning($"Invalid participant email for meeting '{meeting.Name}'");
+                }
             }
         }
-    }
-    private async Task SendReminderEmail(Meeting meeting, SendReminderEmailsService emailService, IMeetingRepository meetingRepository)
-    {
-        try
+        else
         {
-            await emailService.SendReminderEmailsAsync(meeting);
-            
-            // Update the meeting to mark reminder as sent
-            meeting.ReminderSent = true;
-            await meetingRepository.UpdateMeetingAsync(meeting);
-            // Log the meeting participants and their email addresses
-            
-            var participantInfo = string.Join(", ", meeting.MeetingParticipants.Select(p => $"{p.User} ({p.Email})"));
-            _logger.LogInformation($"Reminder email sent for meeting '{meeting.Name}'. Participants: {participantInfo}");
-
-            _logger.LogInformation($"Reminder email sent for meeting '{meeting.Name}'");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Failed to send reminder email for meeting '{meeting.Name}'");
+            _logger.LogWarning($"No participants found for meeting '{meeting.Name}'");
         }
     }
 }

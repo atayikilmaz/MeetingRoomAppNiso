@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using MeetingRoomApp.Models;
 using MeetingRoomApp.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetingRoomApp.Controllers
@@ -17,6 +18,7 @@ namespace MeetingRoomApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<MeetingRoom>> Create(MeetingRoom meetingRoom)
         {
             var createdMeetingRoom = await _meetingRoomService.CreateMeetingRoomAsync(meetingRoom);
@@ -24,6 +26,7 @@ namespace MeetingRoomApp.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             await _meetingRoomService.DeleteMeetingRoomAsync(id);
@@ -31,6 +34,7 @@ namespace MeetingRoomApp.Controllers
         }
         
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<MeetingRoomDto>>> GetAll()
         {
             var meetingRooms = await _meetingRoomService.GetAllMeetingRoomsAsync();

@@ -9,5 +9,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/meeting_rooms?user=postgres&amp;password=deneme123</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="meeting_rooms@dpg-cql2i1t6l47c73f27260-a.frankfurt-postgres.render.com" uuid="1f92313e-0636-4449-8ca5-875897782859">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://dpg-cql2i1t6l47c73f27260-a.frankfurt-postgres.render.com:5432/meeting_rooms</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
