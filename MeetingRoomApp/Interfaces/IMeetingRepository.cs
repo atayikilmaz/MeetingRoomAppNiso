@@ -13,4 +13,8 @@ public interface IMeetingRepository
     Task<bool> IsMeetingOverlappingAsync(int roomId, DateTime start, DateTime end);
 
     Task<IEnumerable<Meeting>> GetUpcomingMeetingsAsync(DateTime start, DateTime end);
+    
+    
+    Task<List<Meeting>> GetMeetingsByRoomAndDateRangeAsync(int roomId, DateTime startDate, DateTime endDate);
+
 }

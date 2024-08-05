@@ -23,10 +23,7 @@ namespace MeetingRoomApp.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
-
-
-
-
+        private readonly ILogger<AuthController> _logger;
 
 
         public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, 
@@ -51,8 +48,6 @@ namespace MeetingRoomApp.Controllers
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "User");
-
                 // Generate 2FA token
                 var token = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
 
@@ -70,6 +65,8 @@ namespace MeetingRoomApp.Controllers
 
             return BadRequest(ModelState);
         }
+        
+        
 
         [HttpPost("verify-2fa")]
         public async Task<IActionResult> VerifyTwoFactorAuth([FromBody] TwoFactorAuthModel model)
@@ -81,9 +78,16 @@ namespace MeetingRoomApp.Controllers
             var result = await _userManager.VerifyTwoFactorTokenAsync(user, "Email", model.Token);
             if (result)
             {
-                await _signInManager.SignInAsync(user, isPersistent: false);
+                // Add user to the "User" role
+                await _userManager.AddToRoleAsync(user, "User");
+
+                // Set EmailConfirmed to true
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+
+                await _signInManager.SignInAsync(user, isPersistent: true);
                 string jwtToken = await GenerateJwtToken(user);
-                return Ok(new { Token = jwtToken, Message = "2FA verification successful" });
+                return Ok(new { Token = jwtToken, Message = "2FA verification successful. User role assigned." });
             }
 
             return BadRequest("Invalid 2FA token");
@@ -97,16 +101,30 @@ namespace MeetingRoomApp.Controllers
                 return BadRequest(ModelState);
             }
 
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return Unauthorized(new { Message = "Invalid login attempt" });
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                return StatusCode(403, new { Message = "Please verify your account with 2FA" });
+            }
+
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
 
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
                 string token = await GenerateJwtToken(user);
-
                 return Ok(new { Token = token, Message = "Login successful" });
             }
 
+            if (result.IsLockedOut)
+                return StatusCode(423, new { Message = "Account is locked out" });
+            if (result.IsNotAllowed)
+                return StatusCode(403, new { Message = "Account is not allowed to sign in" });
+    
             return Unauthorized(new { Message = "Invalid login attempt" });
         }
         

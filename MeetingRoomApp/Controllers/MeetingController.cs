@@ -1,5 +1,6 @@
 using MeetingRoomApp.Dtos;
 using MeetingRoomApp.Interfaces;
+using MeetingRoomApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,5 +62,20 @@ public class MeetingsController : ControllerBase
     {
         await _meetingService.DeleteMeetingAsync(id);
         return Ok(new { message = $"Meeting with id {id} has been deleted." });
+    }
+    
+    
+    [HttpGet("available-slots")]
+    public async Task<ActionResult<List<TimeSlot>>> GetAvailableTimeSlots(int roomId, DateTime date)
+    {
+        try
+        {
+            var availableSlots = await _meetingService.GetAvailableTimeSlotsAsync(roomId, date);
+            return Ok(availableSlots);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using MeetingRoomApp.Dtos;
+using MeetingRoomApp.Models;
 
 namespace MeetingRoomApp.Interfaces;
 
@@ -9,4 +10,7 @@ public interface IMeetingService
     Task<MeetingDto> CreateMeetingAsync(CreateMeetingDto createMeetingDto);
     Task<MeetingDto> UpdateMeetingAsync(UpdateMeetingDto updateMeetingDto);
     Task DeleteMeetingAsync(int id);
+    
+    Task<List<TimeSlot>> GetAvailableTimeSlotsAsync(int roomId, DateTime date);
+
 }

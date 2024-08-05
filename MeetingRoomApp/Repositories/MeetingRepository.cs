@@ -82,4 +82,13 @@ public class MeetingRepository : IMeetingRepository
             await _context.SaveChangesAsync();
         }
     }
+    
+   
+    
+    public async Task<List<Meeting>> GetMeetingsByRoomAndDateRangeAsync(int roomId, DateTime startDate, DateTime endDate)
+    {
+        return await _context.Meetings
+            .Where(m => m.MeetingRoomId == roomId && m.StartDateTime < endDate && m.EndDateTime > startDate)
+            .ToListAsync();
+    }
 }

@@ -11,12 +11,15 @@ public class MeetingService : IMeetingService
     private readonly IMeetingRepository _meetingRepository;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
+    private readonly IMeetingRoomRepository _meetingRoomRepository;
 
-    public MeetingService(IMeetingRepository meetingRepository, IUserService userService, IMapper mapper)
+
+    public MeetingService(IMeetingRepository meetingRepository, IUserService userService, IMapper mapper, IMeetingRoomRepository meetingRoomRepository)
     {
         _meetingRepository = meetingRepository;
         _userService = userService;
         _mapper = mapper;
+        _meetingRoomRepository = meetingRoomRepository;
     }
 
     public async Task<List<MeetingDto>> GetAllMeetingsAsync()
@@ -91,5 +94,35 @@ public class MeetingService : IMeetingService
     {
         await _meetingRepository.DeleteMeetingAsync(id);
     }
+    
+    public async Task<List<TimeSlot>> GetAvailableTimeSlotsAsync(int roomId, DateTime date)
+    {
+        var room = await _meetingRoomRepository.GetByIdAsync(roomId);
+        if (room == null)
+        {
+            throw new ArgumentException("Invalid room id");
+        }
+
+        var startOfDay = date.Date.AddHours(3); // Start at 03:00 UTC
+        var endOfDay = date.Date.AddHours(21); // End at 21:00 UTC
+
+        var existingMeetings = await _meetingRepository.GetMeetingsByRoomAndDateRangeAsync(roomId, startOfDay, endOfDay);
+        var availableSlots = new List<TimeSlot>();
+
+        var currentTime = startOfDay;
+        while (currentTime < endOfDay)
+        {
+            var slotEnd = currentTime.AddMinutes(30);
+            if (!existingMeetings.Any(m => m.StartDateTime < slotEnd && m.EndDateTime > currentTime))
+            {
+                availableSlots.Add(new TimeSlot { StartTime = currentTime, EndTime = slotEnd });
+            }
+            currentTime = slotEnd;
+        }
+
+        return availableSlots;
+    }   
+    
+    
 }
 

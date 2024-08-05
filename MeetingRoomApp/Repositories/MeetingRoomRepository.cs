@@ -22,6 +22,14 @@ namespace MeetingRoomApp.Repositories
             return meetingRoom;
         }
 
+        
+        public async Task<MeetingRoom> GetByIdAsync(int id)
+        {
+            return await _context.MeetingRooms
+                .Include(mr => mr.Meetings)
+                .ThenInclude(m => m.MeetingParticipants)
+                .FirstOrDefaultAsync(mr => mr.Id == id);
+        }
 
         public async Task<IEnumerable<MeetingRoom>> GetAllAsync()
         {
@@ -36,5 +44,6 @@ namespace MeetingRoomApp.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        
     }
 }
