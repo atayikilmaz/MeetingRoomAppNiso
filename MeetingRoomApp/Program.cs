@@ -84,15 +84,18 @@ builder.Services.AddScoped<SendReminderEmailsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<SendReminderEmailsService>();
 
-
+builder.Services.AddScoped<SeedRolesService>();
 
 
 
 
 // Configure Identity
+
 builder.Services.AddIdentityApiEndpoints<User>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
+
+
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -142,7 +145,12 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var seedRolesService = services.GetRequiredService<SeedRolesService>();
+    await seedRolesService.CreateRoles(services);
+}
 
 app.UseRouting();
 
@@ -160,6 +168,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapControllers();
+
 
 
 
