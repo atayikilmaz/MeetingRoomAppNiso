@@ -31,7 +31,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigins",
         builder =>
         {
-            builder.WithOrigins("https://meeting-room-niso-fe.vercel.app")
+            builder.WithOrigins("https://meeting-room-niso-fe.vercel.app/")
                 .AllowAnyHeader()
                 .WithMethods("GET", "POST", "DELETE", "PUT");
         });
