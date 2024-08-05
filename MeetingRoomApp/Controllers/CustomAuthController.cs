@@ -202,7 +202,7 @@ namespace MeetingRoomApp.Controllers
                     string token = await GenerateJwtToken(user);
 
                     // Redirect with token in URL parameters
-                    return Redirect($"http://localhost:3000/login?token={token}");
+                    return Redirect($"https://meeting-room-niso-fe.vercel.app/login?token={token}");
                 }
 
                 return BadRequest();
