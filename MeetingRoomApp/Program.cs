@@ -33,7 +33,9 @@ builder.Services.AddCors(options =>
         {
             builder.WithOrigins("https://meeting-room-niso-fe.vercel.app")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
+
         });
 });
 
