@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeetingRoomApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240729102102_UserSingleRole")]
-    partial class UserSingleRole
+    [Migration("20240805105848_InitialCreate4")]
+    partial class InitialCreate4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,6 +97,9 @@ namespace MeetingRoomApp.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("MeetingRooms");
                 });

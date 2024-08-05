@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeetingRoomApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreate4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -182,7 +182,8 @@ namespace MeetingRoomApp.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     MeetingRoomId = table.Column<int>(type: "integer", nullable: false),
                     StartDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    EndDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ReminderSent = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -202,7 +203,8 @@ namespace MeetingRoomApp.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     MeetingId = table.Column<int>(type: "integer", nullable: false),
-                    ParticipantId = table.Column<string>(type: "text", nullable: false)
+                    ParticipantId = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -267,6 +269,12 @@ namespace MeetingRoomApp.Migrations
                 name: "IX_MeetingParticipants_ParticipantId",
                 table: "MeetingParticipants",
                 column: "ParticipantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MeetingRooms_Name",
+                table: "MeetingRooms",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Meetings_MeetingRoomId",

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeetingRoomApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240726113528_SeedAdminUsers")]
-    partial class SeedAdminUsers
+    [Migration("20240805112831_InitialCreate5")]
+    partial class InitialCreate5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,9 @@ namespace MeetingRoomApp.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("ReminderSent")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("StartDateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -60,6 +63,10 @@ namespace MeetingRoomApp.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("MeetingId")
                         .HasColumnType("integer");
@@ -90,6 +97,9 @@ namespace MeetingRoomApp.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("MeetingRooms");
                 });
@@ -304,6 +314,10 @@ namespace MeetingRoomApp.Migrations
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasDiscriminator().HasValue("User");

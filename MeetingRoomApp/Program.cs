@@ -15,9 +15,16 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DotNetEnv.Env.Load();
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("SUPABASE")));
+{
+    options.UseNpgsql(Environment.GetEnvironmentVariable("SupabaseDB"), npgsqlOptions =>
+    {
+ 
+    });
+});
 
 builder.Services.AddCors(options =>
 {
@@ -61,7 +68,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-DotNetEnv.Env.Load();
 
 builder.Services.AddScoped<IUserAuthRepository, UserAuthRepository>();
 builder.Services.AddScoped<IMeetingRoomRepository, MeetingRoomRepository>();
@@ -134,8 +140,7 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Map Identity endpoints
-app.MapIdentityApi<User>();
+
 
 app.UseRouting();
 
