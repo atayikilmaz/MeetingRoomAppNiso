@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
@@ -31,7 +32,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigins",
         builder =>
         {
-            builder.WithOrigins("https://meeting-room-niso-fe.vercel.app")
+            builder.WithOrigins("https://meeting-room-niso-fe.vercel.app", "http://localhost:3000")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
@@ -79,10 +80,17 @@ builder.Services.AddScoped<IMeetingService, MeetingService>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 builder.Services.AddScoped<SendReminderEmailsService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<SendReminderEmailsService>();
+
+builder.Services.AddHostedService<MeetingReminderJobService>();
+
+// Register ReminderBackgroundService
+
+
+
 
 builder.Services.AddScoped<SeedRolesService>();
 
