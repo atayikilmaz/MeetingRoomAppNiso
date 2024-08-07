@@ -12,7 +12,8 @@ public class AutoMapperProfile : Profile
 
         CreateMap<Meeting, MeetingDto>()
             .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src.MeetingParticipants.Select(mp => mp.User.Name)))
-            .ForMember(dest => dest.MeetingRoom, opt => opt.MapFrom(src => src.MeetingRoom.Name));
+            .ForMember(dest => dest.MeetingRoom, opt => opt.MapFrom(src => src.MeetingRoom.Name))
+            .ForMember(dest => dest.MeetingRoomId, opt => opt.MapFrom(src => src.MeetingRoom.Id));
 
         CreateMap<CreateMeetingDto, Meeting>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))

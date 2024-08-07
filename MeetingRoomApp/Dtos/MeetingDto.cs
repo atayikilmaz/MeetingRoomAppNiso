@@ -8,4 +8,7 @@ public class MeetingDto
     public DateTime EndDateTime { get; set; }
     public List<string> Participants { get; set; }
     public string MeetingRoom { get; set; }
+    
+    public int MeetingRoomId { get; set; }
+
 }
