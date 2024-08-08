@@ -38,14 +38,12 @@ public class MeetingRepository : IMeetingRepository
         return meetings;
     }
     
-    public async Task<bool> IsMeetingOverlappingAsync(int roomId, DateTime startTime, DateTime endTime, int? excludeMeetingId = null)
+    public async Task<bool> IsMeetingOverlappingAsync(int roomId, DateTime start, DateTime end)
     {
         return await _context.Meetings
-            .AnyAsync(m => 
-                m.MeetingRoomId == roomId &&
-                m.Id != excludeMeetingId &&  // Exclude the current meeting
-                m.StartDateTime < endTime && 
-                m.EndDateTime > startTime);
+            .AnyAsync(m => m.MeetingRoomId == roomId && 
+                           m.StartDateTime < end && 
+                           m.EndDateTime > start);
     }
     
     public async Task<Meeting> GetMeetingByIdAsync(int id)

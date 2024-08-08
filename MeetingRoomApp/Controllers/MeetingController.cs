@@ -66,11 +66,11 @@ public class MeetingsController : ControllerBase
     
     
     [HttpGet("available-slots")]
-    public async Task<ActionResult<List<TimeSlot>>> GetAvailableTimeSlots(int roomId, DateTime date)
+    public async Task<ActionResult<List<TimeSlot>>> GetAvailableTimeSlots(int roomId, DateTime date, int? excludeMeetingId = null)
     {
         try
         {
-            var availableSlots = await _meetingService.GetAvailableTimeSlotsAsync(roomId, date);
+            var availableSlots = await _meetingService.GetAvailableTimeSlotsAsync(roomId, date, excludeMeetingId);
             return Ok(availableSlots);
         }
         catch (ArgumentException ex)

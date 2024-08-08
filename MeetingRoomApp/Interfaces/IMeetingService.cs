@@ -11,6 +11,6 @@ public interface IMeetingService
     Task<MeetingDto> UpdateMeetingAsync(UpdateMeetingDto updateMeetingDto);
     Task DeleteMeetingAsync(int id);
     
-    Task<List<TimeSlot>> GetAvailableTimeSlotsAsync(int roomId, DateTime date);
+    Task<List<TimeSlot>> GetAvailableTimeSlotsAsync(int roomId, DateTime date, int? excludeMeetingId = null);
 
 }
