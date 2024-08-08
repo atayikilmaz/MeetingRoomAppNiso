@@ -72,6 +72,19 @@ public class MeetingService : IMeetingService
             throw new NotFoundException($"Meeting with ID {updateMeetingDto.Id} not found.");
         }
 
+        // Check for conflicts, excluding the current meeting
+        bool isOverlapping = await _meetingRepository.IsMeetingOverlappingAsync(
+            updateMeetingDto.MeetingRoomId, 
+            updateMeetingDto.StartDateTime, 
+            updateMeetingDto.EndDateTime,
+            updateMeetingDto.Id // Pass the current meeting ID to exclude it from the check
+        );
+
+        if (isOverlapping)
+        {
+            throw new ConflictException("The updated meeting time overlaps with another meeting in the same room.");
+        }
+
         _mapper.Map(updateMeetingDto, existingMeeting);
 
         // Update participants
@@ -89,7 +102,6 @@ public class MeetingService : IMeetingService
         var updatedMeeting = await _meetingRepository.UpdateMeetingAsync(existingMeeting);
         return _mapper.Map<MeetingDto>(updatedMeeting);
     }
-
     public async Task DeleteMeetingAsync(int id)
     {
         await _meetingRepository.DeleteMeetingAsync(id);
